@@ -11,24 +11,29 @@
 $(document).ready(function() {
   var $block = $('#block')
   $(document).on("click", function(e) {
-    console.log([e.pageX, e.pageY]);
-
-    var velocity = window.getVelocity(e.pageX, e.pageY)
-    console.log(velocity);
-    window.move("#block", velocity[0], velocity[1])
+    var clickX = e.pageX - 50
+    var clickY = e.pageY - 50
+    var velocity = window.getVelocity(clickX, clickY)
+    window.move("#block", velocity[0], velocity[1], clickX, clickY)
   })
 })
 
-function move(id, x, y) {
+function move(id, x, y, clickX, clickY) {
   var $block = $(id)
-  // setTimeout(function() {
-    var left = $block.offset.left
-    var top = $block.offset.top
+  var interval = setInterval(function() {
+    var left = $block.offset().left
+    var top = $block.offset().top
     $block.offset({left: left + x, top: top + y})
-  // }.bind(this), 500)
+    if ((left >= clickX - 5 && left <= clickX + 5) && (top >= clickY - 5 && top <= clickY + 5)) {
+      console.log('hit');
+      console.log([x, y]);
+      console.log([left, top]);
+      console.log([clickX, clickY]);
+      clearInterval(interval)
+    }
+  }.bind(this), 1)
+  $(document).on("click", function() { clearInterval(interval)}.bind(this))
 }
-
-// $('#block').offset({top: 100, left: 400 })
 
 function getVelocity(x, y) {
   var currentX = $('#block').offset().left
@@ -41,6 +46,6 @@ function getVelocity(x, y) {
 function getRelativeVelocity(x, y) {
   var c = Math.pow(x, 2) + Math.pow(y, 2)
   c = Math.pow(c, 0.5)
-  var factor = 5 / c
+  var factor = 2 / c
   return [x * factor, y * factor]
 }
