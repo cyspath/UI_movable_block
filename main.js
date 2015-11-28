@@ -9,31 +9,52 @@
 // }
 
 $(document).ready(function() {
+  run()
   var $block = $('#block')
   $(document).on("click", function(e) {
     var clickX = e.pageX - 50
     var clickY = e.pageY - 50
     var velocity = window.getVelocity(clickX, clickY)
-    window.move("#block", velocity[0], velocity[1], clickX, clickY)
+    window.giveVelocity(velocity[0], velocity[1])
   })
 })
 
-function move(id, x, y, clickX, clickY) {
-  var $block = $(id)
+function giveVelocity(x, y) {
+  Block.left = x
+  Block.top = y
+}
+
+Block = {left: 1, top: 1}
+
+function run () {
+  console.log('run');
   var interval = setInterval(function() {
+    $block = $('#block')
     var left = $block.offset().left
     var top = $block.offset().top
-    $block.offset({left: left + x, top: top + y})
-    if ((left >= clickX - 5 && left <= clickX + 5) && (top >= clickY - 5 && top <= clickY + 5)) {
-      console.log('hit');
-      console.log([x, y]);
-      console.log([left, top]);
-      console.log([clickX, clickY]);
-      clearInterval(interval)
-    }
+    $block.offset({left: left + Block.left, top: top + Block.top})
+    window.checkBounce()
   }.bind(this), 1)
-  $(document).on("click", function() { clearInterval(interval)}.bind(this))
 }
+
+function checkBounce() {
+  $block = $('#block')
+  var left = Math.abs(Block.left)
+  var top = Math.abs(Block.top)
+  if ($block.offset().left >= $(window).width() - 100) {
+    Block.left = -left
+  }
+  if ($block.offset().top >= $(window).height() - 100){
+    Block.top = -top
+  }
+  if ($block.offset().left <= 0){
+    Block.left = left
+  }
+  if ($block.offset().top <= 0){
+    Block.top = top
+  }
+}
+
 
 function getVelocity(x, y) {
   var currentX = $('#block').offset().left
